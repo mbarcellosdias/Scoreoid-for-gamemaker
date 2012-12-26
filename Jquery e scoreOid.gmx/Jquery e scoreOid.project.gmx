@@ -13,6 +13,7 @@
   <scripts name="scripts">
     <scripts name="ScoreOid">
       <script>scripts\listNumberOfPlayers.gml</script>
+      <script>scripts\teste.gml</script>
     </scripts>
   </scripts>
   <objects name="objects">
