@@ -15,6 +15,7 @@ mude async para true, caso queira que todas as funções sejam asincronas
  porém, erros podem ocorrer.
   */
  
+ 
 $.ajaxSetup({
   async: false
 });
@@ -68,11 +69,17 @@ function loadPlayerInfo(proxyUrl,responseType,userName,passWord) // parei aqui.
 		setUnicId(info[0].Player.unic_id);
 		setFirstName(info[0].Player.first_name);
 		setLastName(info[0].Player.last_name);
-		console.log("username:"+info[0].Player.username);
-		console.log("Password:"+info[0].Player.password);
-		console.log("Unic ID:"+info[0].Player.unic_id);
-		console.log("First Name:"+info[0].Player.first_name);
-		console.log("Last Name:"+info[0].Player.last_name);
+		setEmail(info[0].Player.email);
+		setDateCreated(info[0].Player.created);
+		setDateUpdated(info[0].Player.updated);
+		setBonus(info[0].Player.bonus);
+		setAchievements(info[0].Player.achievements);
+		setBestScore(info[0].Player.best_score);
+		//console.log("username:"+info[0].Player.username);
+		//console.log("Password:"+info[0].Player.password);
+		//console.log("Unic ID:"+info[0].Player.unic_id);
+		//console.log("First Name:"+info[0].Player.first_name);
+		//console.log("Last Name:"+info[0].Player.last_name);
 		console.log("---- Fim da chamda da função loadPlayerInfo -----")
 	});
 }
@@ -287,190 +294,234 @@ function setUnlockedLevels(newUnlockedLevel)
 
 function getUnlockedLevel()
 {
+	console.log("get unlocked level:"+this._unlocked_levels);
 	return this._unlocked_levels;
 }
 
 function setUnlockedItems(newUnlockedItem)
 {
+	console.log("set unlocked Items: "+this._unlocked_items);
 	this._unlocked_items = newUnlockedItem;
 }
 
 function getUnlockedItem()
 {
+	console.log("get unlocked items: "+this._unlocked_items);
 	return this._unlocked_items;
 }
 
 function setInventory(newInventory)
 {
 	this._inventory = newInventory;
+	console.log("set inventory: "+this._inventory);
 }
 
 function getInventory()
 {
 	return this._inventory;
+	console.log("get inventory: "+this._inventory);
 }
 
 function setLastLevel(newLastLevel)
 {
 	this._last_level = newLastLevel;
+	console.log("set last level: "+this._last_level);
 }
 
 function getLastLevel()
 {
+	console.log("get last level: "+this._last_level;);
 	return this._last_level;
 }
 
 function setCurrentLevel(newCurrentLevel)
 {
 	this._current_level = newCurentLevel;
+	console.log("set new current level: "+this._current_level);
 }
 
 function getCurrentLevel()
 {
+	console.log("get new current level: "+this._current_level);
 	return this._current_level;
 }
 
 function setCurrentTime(newCurrentTime)
 {
 	this._current_time = newCurrentTime;
+	console.log("set current time: "+this._current_time);
 }
 
 function getCurrentTime()
 {
+	console.log("get current time: "+this._current_time);
 	return this._current_time;
 }
 
 function setCurrentBonus(newCurrentBonus)
 {
 	this._current_bonus = newCurrentBonus;
+	console.log("set current bonus: "+this._current_bonus);
 }
 
 function getCurrentBonus()
 {
+	console.log("get current bonus: "+this._current_bonus);
 	return this._current_bonus;
 }
 
 function setCurrentKills(newCurrentKill)
 {
 	this._current_kills = newCurrentKill;
+	console.log("set current kills: "+this._current_kills);
 }
 
 function getCurrentKills()
 {
+	console.log("get current kills: "+this._current_kills);
 	return this._current_kills;
 }
 
 function setCurrentAchievements(newCurrentAchievement)
 {
 	this._current_achievements = newCurrentAchievement;
+	console.log("set current achievements: "+this._current_achievements);
 }
 
 function getCurrentAchievements()
 {
+	console.log("get current achievements: "+this._current_achievements);
 	return this._current_achievements;
 }
 
 function setCurrentGold(newCurrentGold)
 {
 	this._current_gold = newCurrentGold;
+	console.log("set current gold: "+this._current_gold);
 }
 
 function getCurrentGold()
 {
+	console.log("get current gold: "+this._current_gold);
 	return this._current_gold;
 }
 
 function setCurrentUnlockedLevels(newCurrentUnlockedLevel)
 {
 	this._current_unlocked_levels = newCurrentUnlockedLevels;
+	console.log("set current unlocked level: "+this._current_unlocked_levels);
 }
 
 function getCurrentUnlockedLevels()
 {
+	console.log("get current unlocked level: "+this._current_unlocked_levels);
 	return this._current_unlocked_levels;
 }
 
 function setCurrentUnlockedItems(newCurrentUnlockedItems)
 {
+	console.log("set current unlocked Items: "+this._current_unlocked_items);
 	this._current_unlocked_items = newCurrentUnlockedItems;
 }
 
 function getCurrentUnlockedItems()
 {
+	console.log("get current unlocked items: "+this._current_unlocked_items);
 	return this._current_unlocked_items;
 }
 
 function setCurrentLives(newCurrentLives)
 {
 	this._current_lives = newCurrentLives;
+	console.log("set current lives: "+this._current_lives);
 }
 
 function getCurrentLives()
 {
+	console.log("get current lives: "+this._curent_lives);
 	return this._current_lives;
 }
 
 function setXp(newXp)
 {
 	this._xp = newXp;
+	console.log("set XP: "+this._xp );
 }
 
 function getXp()
 {
+	console.log("get XP: "+ this._xp);
 	return this._xp;
 }
 
 function setBoost(newBoost)
 {
 	this._boost = newBoost;
+	console.log("set boost: "+this._boost);
+}
+
+function getBoost()
+{
+	console.log("get boost: "+this._boost);
+	return this._boost;
 }
 
 function setLatitude(newLatitude)
 {
 	this._latitude = newLatitude;
+	console.log("set Latitude: "+this._latitude);
 }
 
 function getLatitude()
 {
+	console.log("get latitude: "+this._latitude);
 	return this._latitude;
 }
 
 function setLongitude(newLongitude)
 {
 	this._longitude = newLongitude;
+	console.log("set longitude: "+this._longitude);
 }
 
 function getLongitude()
 {
+	console.log("get longitude: "+this._longitude);
 	return this._longitude;
 }
 
 function setGameState(newGameState)
 {
 	this._game_state = newGameState;
+	console.log("set game state: "+this._game_state);
 }
 
 function getGameState()
 {
+	console.log("get game state: "+this._game_state);
 	return this._game_state;
 }
 
 function setPlatform(newPlatform)
 {
 	this._platform = newPlatform;
+	console.log("set platform: "+this._platform);
 }
 
 function getPlatform()
 {
+	console.log("get Platform: "+this._platform);
 	return this._platform;
 }
 
 function setRank(newRank)
 {
 	this._rank = newRank;
+	console.log("set Rank: "+this._rank);
 }
 
 function getRank()
 {
+	console.log("get Rank: "+this._rank);
 	return this._rank;
 }
