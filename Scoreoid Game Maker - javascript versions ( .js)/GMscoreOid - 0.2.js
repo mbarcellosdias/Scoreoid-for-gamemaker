@@ -59,11 +59,25 @@ function loadPlayerInfo(proxyUrl,responseType,userName,passWord) // parei aqui.
 	function(data){
 		var info;
 		info = JSON.parse(data);
+		var error = data.indexOf("Sorry there is no data for your current query");
+		var error2 = data.indexOf("The player does not exists");
+		var error3 = data.indexOf("Please enter player username");
+		var error4 = data.indexOf("Please provide at least username or player_id");
+		// verifica se o usuário existe;
+		
+		if(error >=0 || error2 >=0 || error3 >=0 || error4 >=0 || userName=="" || passWord == "")
+		{
+			console.log("Player does not exists or incorrect password.")
+			console.log("LoadPlayerInfo has Aborted.");
+			return;
+		}
+		else
+		{
 		console.log("--Chamada da função loadPlayerInfo----");
 		//console.log("info parse data:"+info[0].Player);
 		setUserName(info[0].Player.username);
 		setPassWord(info[0].Player.password);
-		setUnicId(info[0].Player.unic_id);
+		setUnicId(info[0].Player.unique_id);
 		setFirstName(info[0].Player.first_name);
 		setLastName(info[0].Player.last_name);
 		setEmail(info[0].Player.email);
@@ -89,6 +103,7 @@ function loadPlayerInfo(proxyUrl,responseType,userName,passWord) // parei aqui.
 		setCurrentUnlockedLevels(info[0].Player.current_unlocked_levels);
 		setCurrentUnlockedItems(info[0].Player.current_unlocked_items);
 		setCurrentLives(info[0].Player.current_lives);
+		setCurrentLevel(info[0].Player.current_level);
 		setXp(info[0].Player.xp);
 		setEnergy(info[0].Player.energy);
 		setBoost(info[0].Player.boost);
@@ -103,6 +118,8 @@ function loadPlayerInfo(proxyUrl,responseType,userName,passWord) // parei aqui.
 		//console.log("First Name:"+info[0].Player.first_name);
 		//console.log("Last Name:"+info[0].Player.last_name);
 		console.log("---- Fim da chamda da função loadPlayerInfo -----")
+		//console.log(data);
+		}
 	});
 }
 
@@ -139,59 +156,59 @@ function getPassWord(){
 }
 
 
-function editPassWord(proxyUrl,responseType,userName,newPassWord)
+function editPassWord(proxyUrl,responseType,userName,currentPassWord,newPassWord) 
 {
-	/*
-	 Status: testado e ok.
-	 
-	 Esta função tem o objetivo de mudar a senha de um determinado usuário já cadastrado no sistema scoreoid dentro do jogo contido em proxyUrl.
-	 O retorno responseType será JSON, no entanto não há porque realizar conversões para fazer callback para dentro do gameMaker:Studio, já que a escrita dessa alteração
-	 será enviada diretamente para o servidor scoreoid.com.
-	 
-	 Explicando o funcionamento da função editPassword:
-	 
-	 Caso o parâmetro userName ou newPassWord estiverem em branco, a mudança de senha não prosseguirá e lançará um erro, informando que nenhum campo pode estar em branco.
-	 Caso contrário, tentaremos enviar via post, um método editPlayer, informando ao scoreoid que queremos fazer uma edição JSON(response:responseType) no username passado pelo parâmetro
-	 da função, e que o resultado dessa mudança será um newPassWord, também passado por parâmetro pelo usuário.
-	 
-	 O post irá enviar a informação para o seu jogo no servidor scoreoid.com e lhe retornará uma resposta.
-	 A resposta possível neste caso é:
-	 
-	 The player does not exists: esta resposta indica que o usuário digitado não foi encontrado neste jogo.
-	 
-	 Para tratar este caso, varremos a array data, que contém todos os dados de retorno do envio feito pelo $.post, a procura da mensagem de erro especifica: "The player does not exists"
-	 Caso essa mensagem seja encontrada, um valor maior que 0 (true) será retornado e, neste caso, tratamos o erro enviando a mensagem de que o usuário digitado não existe.
-	 
-	 Caso contrário, significa que não houve nenhum erro, logo, o valor retornado será 0 (false). então, a função retorna uma mensagem informando que o password foi mudado
-	 com sucesso.
-	 
-	 * */
-	if(userName == "" || newPassWord =="")
-	{
-		console.log("username and new password is required.");
-		console.log("No change was made.");
-		alert("Nenhum campo pode ficar em branco. \n nenhuma alteração foi feita");
-	}
-	else
-	{
-		$.post(proxyUrl,{action:'curl_request', method:'editPlayer',response:responseType, username:userName, password:newPassWord},
+	// Still cant check If currentPassword = playerPassword .. need help with this.
+console.log("finding the player...")
+$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:responseType, username:userName, password:currentPassWord},
+	function(data){
+		
+		var error = data.indexOf("Sorry there is no data for your current query");
+		var error2 = data.indexOf("The player does not exists");
+		var error3 = data.indexOf("Please enter player username");
+		var error4 = data.indexOf("Please provide at least username or player_id");
+		//console.log(data);
+		if(error >=0 || error2 >=0 || error3 >=0 || error4 >=0 || userName == "")
+		{
+			console.log("the player "+userName+" does not exists or the password was incorrect.");
+			//console.log(data);
+			//alert("O Jogador"+userName+"não existe");
+		}
+		else
+		{
+			//console.log(data);
+			if(newPassWord == "")
+			{
+				console.log("New Password can not be blank");
+				//console.log(data);
+			}
+			else
+			{
+					console.log(data);
+					$.post(proxyUrl,{action:'curl_request', method:'editPlayer',response:responseType, username:userName, password:newPassWord},
 							function(data){
-								var error = data.indexOf("The player does not exists");
-								if (error >=0)
-								{
-									console.log("the player "+userName+" does not Exists.");
-									alert("O Jogador "+userName+" Não existe.");
-								}
-								else
-								{
-									console.log("Password has changed successfuly.");
-									alert("Password mudado com sucesso.");
-									console.log(data);
-								}
+									var error = data.indexOf("The player does not exists");
+									if(error >=0)
+									{
+										console.log("O usuário digitado não foi encontrado no game server.");
+										//console.log(data);
+									}
+									else
+									{
+										console.log("Usuário "+userName+" localizado");
+										console.log("the typed password matches with "+userName+"passwords stored in game server. ");
+										console.log("the PassWord has changed successfuly.");
+										//console.log(data);
+									}
+								
+								//console.log(data);
 							});
-	}
+					
+			}
+		}
+		
+	});
 }
-
 
 function setUnicId(newUnicId)
 {
@@ -413,13 +430,13 @@ function getLastLevel()
 
 function setCurrentLevel(newCurrentLevel)
 {
-	this._current_level = newCurentLevel;
-	console.log("set new current level: "+this._current_level);
+	this._current_level = newCurrentLevel;
+	console.log("set current level: "+this._current_level);
 }
 
 function getCurrentLevel()
 {
-	console.log("get new current level: "+this._current_level);
+	console.log("get current level: "+this._current_level);
 	return this._current_level;
 }
 
