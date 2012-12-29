@@ -1,4 +1,6 @@
 var count;
+var validate;
+var _notifications;
 // campos de informações sobre o jogador.
 var _username, _password, _unic_id, _first_name, _last_name, _email;
 var _created, _updated, _bonus, _achievements, _best_score, _gold, _money;
@@ -20,42 +22,43 @@ $.ajaxSetup({
   async: false
 });
 
-
-function createPlayer(proxyUrl,responseType,userName,passWord,firstName,lastName,eMail)
+function createPlayer(proxyUrl,userName,passWord,firstName,lastName,eMail)
 {
-      $.post(proxyUrl, {action:'curl_request', method:'createPlayer', response: responseType, username:userName, password:passWord, first_name:firstName, last_name:lastName,email:eMail}, 
+      $.post(proxyUrl, {action:'curl_request', method:'createPlayer', response: 'json', username:userName, password:passWord, first_name:firstName, last_name:lastName,email:eMail}, 
         function(data) {
           alert("Data Loaded: " + data);
-          console.log(data);
+          info = JSON.parse(data);
+          
+          //console.log(data);
       });
 	  
 }
   
-function deletePlayer(proxyUrl,userName,responseType)
+function deletePlayer(proxyUrl,userName)
 {
-	$.post(proxyUrl,{action:'curl_request', method:'deletePlayer',response:responseType,username:userName},
+	$.post(proxyUrl,{action:'curl_request', method:'deletePlayer',response:'json',username:userName},
 		function(data){
 			//alert('Data Loaded: '+ data);
-			console.log(data);
+			//console.log(data);
 		});
 }
 
-function countPlayers(proxyUrl,responseType)
+function countPlayers(proxyUrl)
 {
-	$.post(proxyUrl,{action:'curl_request', method:'countPlayers',response:responseType},
+	$.post(proxyUrl,{action:'curl_request', method:'countPlayers',response:'json'},
 		function(data){
 			count = data;
 			//alert('Data Loaded: '+ data);
-			console.log(data);
+			//console.log(data);
 		});	
 }
 
 // Funções que possibilitam um callback no game maker
 
-function loadPlayerInfo(proxyUrl,responseType,userName,passWord) // parei aqui.
+function loadPlayerInfo(proxyUrl,userName,passWord) // parei aqui.
 
 {
-	$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:responseType, username:userName, password:passWord},
+	$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:'json', username:userName, password:passWord},
 	function(data){
 		var info;
 		info = JSON.parse(data);
@@ -118,11 +121,39 @@ function loadPlayerInfo(proxyUrl,responseType,userName,passWord) // parei aqui.
 		//console.log("First Name:"+info[0].Player.first_name);
 		//console.log("Last Name:"+info[0].Player.last_name);
 		console.log("---- Fim da chamda da função loadPlayerInfo -----")
-		//console.log(data);
+		////console.log(data);
 		}
 	});
 }
 
+function pushNotifications(proxyUrl)
+{
+	try
+	{
+	$.post(proxyUrl,{action:'curl_request', method:'getNotification',response:'json'},
+	function(data){
+		notif = eval(JSON.parse(data));
+		console.log("Notification:"+notif.notifications.game_notification[0].GameNotification.content);
+		
+		setNotifications(notif.notifications.game_notification[0].GameNotification.content);
+	});
+	}
+	catch(error)
+	{
+		console.log("No new notifications found.");
+	}
+}
+
+function setNotifications(newNotification)
+{
+	this._notifications = newNotification;
+	console.log("Notification sent:"+this._notifications);
+}
+
+function getNotifications()
+{
+	return this._notifications
+}
 
 function pollCount()
 {
@@ -156,54 +187,52 @@ function getPassWord(){
 }
 
 
-function editPassWord(proxyUrl,responseType,userName,currentPassWord,newPassWord) 
+function editPassWord(proxyUrl,userName,currentPassWord,newPassWord) 
 {
-	// Still cant check If currentPassword = playerPassword .. need help with this.
-console.log("finding the player...")
-$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:responseType, username:userName, password:currentPassWord},
+
+$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:'json', username:userName, password:currentPassWord},
 	function(data){
-		
+		console.log("finding the player...");		
 		var error = data.indexOf("Sorry there is no data for your current query");
 		var error2 = data.indexOf("The player does not exists");
 		var error3 = data.indexOf("Please enter player username");
 		var error4 = data.indexOf("Please provide at least username or player_id");
-		//console.log(data);
+		
 		if(error >=0 || error2 >=0 || error3 >=0 || error4 >=0 || userName == "")
 		{
 			console.log("the player "+userName+" does not exists or the password was incorrect.");
-			//console.log(data);
-			//alert("O Jogador"+userName+"não existe");
 		}
 		else
 		{
-			//console.log(data);
-			if(newPassWord == "")
+			if(currentPassWord == "")
 			{
-				console.log("New Password can not be blank");
-				//console.log(data);
+				console.log("Password can not be blank");
 			}
 			else
 			{
+				if(newPassWord == "")
+				{
+					console.log("New Password can not be blank");
+					console.log("Operation Aborted.")
+					return;
+				}
+				else
+				{
 					console.log("trying to make the changes...");
-					$.post(proxyUrl,{action:'curl_request', method:'editPlayer',response:responseType, username:userName, password:newPassWord},
+					$.post(proxyUrl,{action:'curl_request', method:'editPlayer',response:'json', username:userName, password:newPassWord},
 							function(data){
 									var error = data.indexOf("The player does not exists");
 									if(error >=0)
 									{
 										console.log("The user was not found or does not exists.");
-										//console.log(data);
 									}
 									else
 									{
-										console.log("Usuário "+userName+" localizado");
-										console.log("the typed password matches with "+userName+"passwords stored in game server. ");
+										console.log("User "+userName+" found.");
 										console.log("the PassWord has changed successfuly.");
-										//console.log(data);
 									}
-								
-								//console.log(data);
 							});
-					
+				}
 			}
 		}
 		
@@ -234,6 +263,63 @@ function getFirstName()
 	return this._first_name;
 }
 
+function editFirstName(proxyUrl,userName,passWord,newFirstName) 
+{
+
+$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:'json', username:userName, password:passWord},
+	function(data){
+		console.log("finding the player...");		
+		var error = data.indexOf("Sorry there is no data for your current query");
+		var error2 = data.indexOf("The player does not exists");
+		var error3 = data.indexOf("Please enter player username");
+		var error4 = data.indexOf("Please provide at least username or player_id");
+		
+		if(error >=0 || error2 >=0 || error3 >=0 || error4 >=0 || userName == "" )
+		{
+			console.log("the player  does not exists OR the password was incorrect.");
+			return;
+		}
+		else
+		{
+			if(passWord == "")
+			{
+				console.log("Password can not be blank.");
+				return;
+			}
+			else
+			{
+				if(newFirstName == "")
+				{
+					console.log("New FirstName can not be blank");
+					console.log("Operation Aborted.")
+					return;
+				}
+				else
+				{
+					console.log("trying to make the changes...");
+					
+					$.post(proxyUrl,{action:'curl_request', method:'editPlayer',response:'json', username:userName, first_name:newFirstName},
+							function(data){
+									var error = data.indexOf("The player does not exists");
+									if(error >=0)
+									{
+										console.log("The user was not found or does not exists.");
+									}
+									else
+									{
+										console.log("User found.");
+										console.log("the First Name has changed to: "+newFirstName+" successfully.");
+									}
+							});
+				}	
+			}
+		}
+		
+	});
+}
+
+
+
 function setLastName(newLastName)
 {
 	this._last_name = newLastName;
@@ -244,6 +330,62 @@ function getLastName()
 {
 	console.log("getLastName:"+this._last_name);
 	return this._last_name;
+}
+
+function editLastName(proxyUrl,userName,passWord,newLastName) 
+{
+
+$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:'json', username:userName, password:passWord},
+	function(data){
+		console.log("finding the player...");		
+		var error = data.indexOf("Sorry there is no data for your current query");
+		var error2 = data.indexOf("The player does not exists");
+		var error3 = data.indexOf("Please enter player username");
+		var error4 = data.indexOf("Please provide at least username or player_id");
+		
+		if(error >=0 || error2 >=0 || error3 >=0 || error4 >=0 || userName == "" )
+		{
+			console.log("the player does not exists OR the password was incorrect.");
+			return;
+		}
+		else
+		{
+			if(passWord == "")
+			{
+				console.log("Password can not be blank.");
+				return;
+			}
+			else
+			{
+				if(newLastName == "")
+				{
+					console.log("LastName can not be blank");
+					console.log("Operation Aborted.")
+					return;
+				}
+				else
+				{
+					console.log("trying to make the changes...");
+					
+					$.post(proxyUrl,{action:'curl_request', method:'editPlayer',response:'json', username:userName, last_name:newLastName},
+							function(data){
+									var error = data.indexOf("The player does not exists");
+									if(error >=0)
+									{
+										console.log("The user was not found or does not exists.");
+									}
+									else
+									{
+										console.log("User "+userName+" found");
+										console.log("the Last name has changed to: "+newLastName+" successfully.");
+									}
+							});
+					
+				}//fim do else newlastName == ""
+			}
+		}
+		
+	});
 }
 
 function setEmail(newEmail)
@@ -257,6 +399,63 @@ function getEmail()
 	console.log("get E-mail:"+this._email);
 	return this._email;
 }
+
+function editEmail(proxyUrl,userName,passWord,newEmail) 
+{
+
+$.post(proxyUrl,{action:'curl_request', method:'getPlayer',response:'json', username:userName, password:passWord},
+	function(data){
+		console.log("finding the player...");		
+		var error = data.indexOf("Sorry there is no data for your current query");
+		var error2 = data.indexOf("The player does not exists");
+		var error3 = data.indexOf("Please enter player username");
+		var error4 = data.indexOf("Please provide at least username or player_id");
+		
+		if(error >=0 || error2 >=0 || error3 >=0 || error4 >=0 || userName == "" )
+		{
+			console.log("the player does not exists OR the password was incorrect.");
+			return;
+		}
+		else
+		{
+			if(passWord == "")
+			{
+				console.log("Password can not be blank.");
+				return;
+			}
+			else
+			{
+				if(newEmail == "")
+				{
+					console.log("New e-mail can not be blank");
+					console.log("Operation Aborted.")
+					return;
+				}
+				else
+				{
+					console.log("trying to make the changes...");
+					
+					$.post(proxyUrl,{action:'curl_request', method:'editPlayer',response:'json', username:userName, email:newEmail},
+							function(data){
+									var error = data.indexOf("The player does not exists");
+									if(error >=0)
+									{
+										console.log("The user was not found or does not exists.");
+									}
+									else
+									{
+										console.log("User "+userName+" found");
+										console.log("your e-mail has changed to: "+newEmail);
+									}
+							});
+					
+				}
+			}
+		}
+		
+	});
+}
+
 
 function setDateCreated(newDateCreated) // revisar a gramatica do nome da função.
 {
@@ -630,4 +829,14 @@ function getRank()
 {
 	console.log("get Rank: "+this._rank);
 	return this._rank;
+}
+
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
 }
